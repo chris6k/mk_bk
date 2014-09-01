@@ -22,6 +22,16 @@ module.exports.getFriends = function (uid, callback) {
 };
 
 /**
+ * 获取好友排名
+ * @param callback
+ */
+module.exports.getFriendsRank = function (callback) {
+    pool.query('select INVITE_COUNT friendCount, LAST_MONTH_FRIENDS_COMMISSION lastMonthCommission from accounts order by friendCount, lastMonthCommission desc limit 0,3', function (err, rows, fields) {
+        callback(err, rows, fields);
+    });
+};
+
+/**
  * 获取账户信息
  * @param uid
  * @param callback
@@ -78,9 +88,9 @@ module.exports.getBillingList = function (userId, index, count, callback) {
  * @param paymentType
  * @param callback
  */
-module.exports.askPayment = function (userId, payment, paymentType, callback) {
-    pool.query("insert into user_settlement(USER_ID,PAYMENT,DATE_DAY,PAYMENT_TYPE,STATE)values(?,?,?,?,?)",
-        [userId, payment, new Date(), paymentType, 0],
+module.exports.askPayment = function (userId, account, payment, paymentType, callback) {
+    pool.query("insert into user_settlement(USER_ID,ACCOUNT_ID, PAYMENT,DATE_DAY,PAYMENT_TYPE,STATE)values(?,?,?,?,?)",
+        [userId, account, payment, new Date(), paymentType, 0],
         function (err, rows, fields) {
             callback(err, rows, fields);
         }
