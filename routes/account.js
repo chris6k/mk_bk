@@ -10,24 +10,38 @@ router.get('/info', auth, function (req, res) {
     db.getAccountInfo(req.param('uid'), function (err, rows, result) {
         var ret = {result: false, data: null};
         if (err) {
-            next(err);
             res.json(200, ret)
         } else {
             ret.result = true;
-            ret.data = result;
+            if (rows.length > 0) {
+                ret.data = rows[0];
+            }
             res.json(200, ret);
         }
     });
 });
 
-router.get('/reg', function (req, res) {
+router.post('/reg', function (req, res) {
     db.regUser(req.param("user_id"), req.param("i_hash"), function (err, rows, result) {
         var ret = {result: false, data: null};
         if (!err) {
             ret.result = true;
-            ret.data = result;
+            ret.data = rows.insertId;
         } else {
-            ret.data = "无法注册该用户";
+            if (err.sqlState == 23000) {
+                db.getUserIdByHash(req.param("i_hash"), function (err, rows, result) {
+                    if (!err && rows.length > 0) {
+                        ret.result = true;
+                        ret.data = rows[0].id;
+                    } else {
+                        ret.data = "无法注册该用户";
+                    }
+                    res.json(200, ret);
+                });
+                return;
+            } else {
+                ret.data = "无法注册该用户";
+            }
         }
         res.json(200, ret);
     });

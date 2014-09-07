@@ -6,7 +6,8 @@ var pool = mysql.createPool({
     connectionLimit: 10,
     host: 'localhost',
     user: 'mk_admin',
-    password: '111111'
+    password: '111111',
+    database: "mk_db"
 });
 
 
@@ -16,9 +17,8 @@ var pool = mysql.createPool({
  * @param callback
  */
 module.exports.getFriends = function (uid, callback) {
-    pool.query('select INVITE_COUNT friendCount, LAST_MONTH_FRIENDS_COMMISSION lastMonthCommission from accounts where invite_user_id = ?', [uid], function (err, rows, fields) {
-        callback(err, rows, fields);
-    });
+    pool.query('select INVITE_COUNT friendCount, LAST_MONTH_FRIENDS_COMMISSION lastMonthCommission from accounts  ' +
+        'where invite_user_id = ?', [uid], callback);
 };
 
 /**
@@ -26,10 +26,10 @@ module.exports.getFriends = function (uid, callback) {
  * @param callback
  */
 module.exports.getFriendsRank = function (callback) {
-    pool.query('select INVITE_COUNT friendCount, LAST_MONTH_FRIENDS_COMMISSION lastMonthCommission from accounts order by friendCount, lastMonthCommission desc limit 0,3', function (err, rows, fields) {
-        callback(err, rows, fields);
-    });
-};
+    pool.query('select INVITE_COUNT friendCount, LAST_MONTH_FRIENDS_COMMISSION lastMonthCommission from  ' +
+        ' accounts order by friendCount, lastMonthCommission desc limit 0,3', callback);
+}
+;
 
 /**
  * 获取账户信息
@@ -37,22 +37,17 @@ module.exports.getFriendsRank = function (callback) {
  * @param callback
  */
 module.exports.getAccountInfo = function (uid, callback) {
-    pool.query('select id, i_hash iHash, invite_user_id inviteUserId, task_count taskCount, invite_count inviteCount, last_month_friends_commission, balance from account where id = ?', [uid], function (err, rows, fields) {
-        callback(err, rows, fields);
-    });
+    pool.query('select id, i_hash iHash, invite_user_id inviteUserId, ' +
+            'task_count taskCount, invite_count inviteCount, last_month_friends_commission, balance from account where id = ?',
+        [uid], callback);
 };
 
 module.exports.getBalanceByUid = function (uid, callback) {
-    pool.query("select balance from account where id = ?", [uid], function (err, rows, fields) {
-        callback(err, rows, fields);
-    });
+    pool.query("select balance from account where id = ?", [uid], callback);
 };
 
 module.exports.updateLastMonthFriendsComm = function (uid, lastComm, callback) {
-    pool.query('update account set LAST_MONTH_FRIENDS_COMMISSION = ? where ID = ?', [lastComm, uid],
-        function (err, rows, fields) {
-            callback(err, rows, fields);
-        });
+    pool.query('update account set LAST_MONTH_FRIENDS_COMMISSION = ? where ID = ?', [lastComm, uid], callback);
 };
 
 /**
@@ -62,10 +57,9 @@ module.exports.updateLastMonthFriendsComm = function (uid, lastComm, callback) {
  * @param callback
  */
 module.exports.regUser = function (userId, iHash, callback) {
-    pool.query('insert into account(invite_user_id, i_hash, created_at, task_count, invite_count, balance) values(?,?,?,?,?,?)'
-        , [userId ? userId : 0, iHash, new Date(), 0, userId ? 1 : 0, 0], function (err, rows, fields) {
-            callback(err, rows, fields);
-        });
+    pool.query('insert into account(invite_user_id, i_hash, created_at, task_count, invite_count, balance) ' +
+            ' values(?,?,?,?,?,?)'
+        , [userId ? userId : 0, iHash, new Date(), 0, userId ? 1 : 0, 0], callback);
 }
 
 /**
@@ -76,9 +70,9 @@ module.exports.regUser = function (userId, iHash, callback) {
  * @param callback
  */
 module.exports.getBillingList = function (userId, index, count, callback) {
-    pool.query("select ID id, USER_ID useId, DESCRIPTION description,  DEBIT debit, CREDIT credit, CREATED_AT dateDay from user_billing where user_id = ? limit ?,?", [userId, index || 0, count || 10], function (err, rows, fields) {
-        callback(err, rows, fields);
-    });
+    pool.query("select ID id, USER_ID useId, DESCRIPTION description,  DEBIT debit," +
+            " CREDIT credit, CREATED_AT dateDay from user_billing where user_id = ? limit ?,?",
+        [userId, index || 0, count || 10], callback);
 };
 
 /**
@@ -90,19 +84,17 @@ module.exports.getBillingList = function (userId, index, count, callback) {
  */
 module.exports.askPayment = function (userId, account, payment, paymentType, callback) {
     pool.query("insert into user_settlement(USER_ID,ACCOUNT_ID, PAYMENT,DATE_DAY,PAYMENT_TYPE,STATE)values(?,?,?,?,?)",
-        [userId, account, payment, new Date(), paymentType, 0],
-        function (err, rows, fields) {
-            callback(err, rows, fields);
-        }
+        [userId, account, payment, new Date(), paymentType, 0], callback
     );
 };
 
 module.exports.saveFinishTask = function (userId, platformId, taskId, amount, taskName, callback) {
     pool.query("insert into task(name, user_id, created_at, platform_id, unit, state) values(?,?,?,?,?,?)"),
-        [taskName, userId, new Date(), platformId, amount, 1],
-        function (err, rows, fields) {
-            callback(err, rows, fields);
-        }
+        [taskName, userId, new Date(), platformId, amount, 1], callback
+};
+
+module.exports.getUserIdByHash = function (hash, callback) {
+    pool.query("select id as id from account where i_hash=?", [hash], callback);
 };
 
 

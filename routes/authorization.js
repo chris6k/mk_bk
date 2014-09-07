@@ -6,8 +6,9 @@ exports.authorize = function (req, res, next) {
     } else {
         var tokenParams = decodeURIComponent(token).split("|");
         if (tokenParams.length == 2) {
-            db.getAccountInfo(tokenParams[0], function (err, row, user) {
-                if (!user || user.iHash != tokenParams[1]) {
+            db.getAccountInfo(tokenParams[0], function (err, row, fields) {
+                var ihash = row[0].iHash.toString("utf-8").toLowerCase();
+                if (err || row.length == 0 || ihash != tokenParams[1]) {
                     res.json(400, {result: false, msg: "无效的请求"});
                 } else {
                     next();

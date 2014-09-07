@@ -12,6 +12,7 @@ var invite = require('./routes/invite');
 var payment = require('./routes/payment');
 
 var app = express();
+app.listen(8000);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -24,11 +25,11 @@ app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/friends', friends);
-app.use('/account', accounts);
-app.use('/billing', billing);
-app.use('/invite', invite);
-app.use('/payment', payment);
+app.use('/mk/api/friends', friends);
+app.use('/mk/api/account', accounts);
+app.use('/mk/api/billing', billing);
+app.use('/mk/api/invite', invite);
+app.use('/mk/api/payment', payment);
 
 /// catch 404 and forward to error handler
 app.use(function (req, res, next) {
