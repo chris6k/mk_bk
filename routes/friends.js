@@ -9,9 +9,13 @@ var auth = require('./authorization').authorize;
 router.get('/info', auth, function (req, res) {
     db.getFriends(req.params.id, function (err, rows, result) {
         if (err) {
-            next(err);
+            res.json(200, {result: false, data: "发生错误"});
         } else {
-            res.json(200, result);
+            if (rows.length > 0) {
+                res.json(200, {result: true, data: rows});
+            } else {
+                res.json(200, {result: true, data: {}});
+            }
         }
     });
 });
@@ -19,9 +23,13 @@ router.get('/info', auth, function (req, res) {
 router.get('/rank', auth, function (req, res) {
     db.getFriendsRank(function (err, rows, result) {
         if (err) {
-            next(err);
+            res.json(200, {result: false, data: "发生错误"});
         } else {
-            res.json(200, result);
+            if (rows.length > 0) {
+                res.json(200, {result: true, data: rows});
+            } else {
+                res.json(200, {result: true, data: {}});
+            }
         }
     });
 });

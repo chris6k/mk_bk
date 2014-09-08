@@ -7,12 +7,15 @@ var db = require('../db/mysql');
 var auth = require('./authorization').authorize;
 
 router.get('/list', auth, function (req, res) {
-    db.getBillingList(req.param('uid'), req.param('idx'), req.param('total'), function (err, data) {
+    db.getBillingList(req.param('uid'), req.param('idx'), req.param('total'), function (err, rows, fields) {
         if (err) {
-            next(err);
-            res.json(200, {result: false})
+            res.json(200, {result: false, data: "发生错误"});
         } else {
-            res.json(200, {result: false, data: data});
+            if (rows.length > 0) {
+                res.json(200, {result: true, data: rows});
+            } else {
+                res.json(200, {result: true, data: {}});
+            }
         }
     });
 });
