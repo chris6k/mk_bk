@@ -14,7 +14,7 @@ router.get('/list', auth, function (req, res) {
             if (rows.length > 0) {
                 res.json(200, {result: true, data: rows});
             } else {
-                res.json(200, {result: true, data: {}});
+                res.json(200, {result: true, data: []});
             }
         }
     });

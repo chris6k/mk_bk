@@ -10,6 +10,7 @@ var accounts = require('./routes/account');
 var billing = require('./routes/billing');
 var invite = require('./routes/invite');
 var payment = require('./routes/payment');
+var task = require('./routes/task');
 
 var app = express();
 app.listen(8000);
@@ -30,6 +31,7 @@ app.use('/mk/api/account', accounts);
 app.use('/mk/api/billing', billing);
 app.use('/mk/api/invite', invite);
 app.use('/mk/api/payment', payment);
+app.use('/mk/api/task', task);
 
 /// catch 404 and forward to error handler
 app.use(function (req, res, next) {
